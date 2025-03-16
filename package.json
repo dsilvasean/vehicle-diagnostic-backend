@@ -19,13 +19,16 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.13.0",
     "sequelize": "^6.37.6",
+    "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
   },
   "_moduleAliases": {
     "@routes": "./routes",
     "@config": "./config",
     "@models": "./models",
-    "@controllers":"./controllers"
+    "@controllers": "./controllers",
+    "@utils" : "./utils"
   }
 }

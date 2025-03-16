@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: My API
+  version: 1.0.0
+  description: API Documentation for My Express App
+
+servers:
+  - url: http://localhost:3000
+    description: Local server
+
+tags:
+  - name: Authentication
+    description: API endpoints for user authentication
+  - name: General
+    description: General API endpoints
+
+paths:
+  /api/user/register:
+    post:
+      summary: Register a new user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - email
+                - phone
+                - password
+              properties:
+                firstName:
+                  type: string
+                  example: "John"
+                lastName:
+                  type: string
+                  example: "Doe"
+                email:
+                  type: string
+                  example: "john@example.com"
+                password:
+                  type: string
+                  example: "securepassword123"
+                phone:
+                  type: string
+                  example: "91 1234567890"
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Missing required fields
+        500:
+          description: Internal server error
+
+  /api/user/login:
+    post:
+      summary: Login a user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: "john@example.com"
+                password:
+                  type: string
+                  example: "securepassword123"
+      responses:
+        201:
+          description: User logged in successfully
+        400:
+          description: Missing required fields
+        500:
+          description: Internal server error
+
+  /api/chat:
+    post:
+      summary: API to interact with the assistant
+      description: Accepts a JSON object and returns the same data with a success message.
+      tags: [General]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  example: "Why is my engine overheating"
+      responses:
+        200:
+          description: Successfully processed request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data received successfully"
+                  data:
+                    type: object
+                    properties:
+                      response:
+                        type: string
+                        example: "Because of so and so reason"

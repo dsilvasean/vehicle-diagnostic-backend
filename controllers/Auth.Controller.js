@@ -1,19 +1,31 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User } = require("@models/");
+const { sendResponse } = require("@utils/utilsHandler");
 
 exports.registerUser = async (req, res) =>{
     try{
         console.log(req.body)
-        const {name, email, password} = req.body;
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
+        const {firstName, lastName, email, phone, password} = req.body;
+        if (!firstName || !lastName || !email || !password) {
+            return sendResponse(res, 400, false, "required fields are not present")
         }
-        const newUser = await User.create({ name, email, password: password});
-        res.status(201).json({status:true, message: "User registered successfully", id: newUser.id });
+        let userData = { firstName, lastName, email, phone, password };
+        userData = Object.fromEntries(
+            Object.entries(userData).filter(([_, value]) => value !== "")
+        );
+        let newUser = await User.create(userData, { returning: true });
+        const accessToken = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, { expiresIn: "6h" });
+        const refreshToken = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+        let data = newUser.toJSON()
+        data.jwt_token = accessToken;
+        data.jwt_refresh = refreshToken;
+        let extras = "jwt_token_validity: 6h, jwt_refresh_validity: 1d"
+        return sendResponse(res, 201, true, "User registered successfully", data=data, extras=extras)
     }
     catch (error) {
-        res.status(500).json({status:false, error:error.message})
+        return sendResponse(res, 500, false, error.message)
     }
 }
 
