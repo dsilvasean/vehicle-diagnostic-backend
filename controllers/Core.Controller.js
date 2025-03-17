@@ -41,17 +41,3 @@ exports.uploadData = async (req, res) => {
     }
 }
 
-exports.getUserProfile = async(req, res) => {
-    try{
-        const user = await User.findOne({ where: { id:req.user.id } });
-        let data = user.toJSON()
-        return sendResponse(res, 200, true, "Authentication successfull", data=data, )
-    }
-    catch(error){
-        return sendResponse(res, 500, false, error.message)
-
-    }
-
-
-
-}

@@ -100,7 +100,7 @@ paths:
         security:
           - bearerAuth: []  # Require JWT authentication for this endpoint
         tags:
-          - General
+          - User
         responses:
           "200":
             description: Successfully retrieved user profile
@@ -121,6 +121,41 @@ paths:
             description: Unauthorized (Invalid or missing token)
           "403":
             description: Forbidden (Token expired or invalid) 
+
+  /api/user/edit:
+    post:
+      summary: Update new user
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  example: "John"
+                lastName:
+                  type: string
+                  example: "Doe"
+                email:
+                  type: string
+                  example: "john@example.com"
+                password:
+                  type: string
+                  example: "securepassword123"
+                phone:
+                  type: string
+                  example: "91 1234567890"
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Missing required fields
+        500:
+          description: Internal server error
+
   /api/upload:
     post:
       summary: Upload a file
