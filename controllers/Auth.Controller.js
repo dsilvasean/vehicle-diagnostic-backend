@@ -32,16 +32,24 @@ exports.registerUser = async (req, res) =>{
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+        if (!email || !password) {
+            return sendResponse(res, 400, false, "required fields are not present")
+        }
         const user = await User.findOne({ where: { email } });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return sendResponse(res, 401, false, "Invalid Credentials")
+        }
         const passwordMatch = await bcrypt.compare(password, user.password);
         console.log(email, password, user, passwordMatch)
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ status:false, message: "Invalid credentials" });
-        }
+        let data = user.toJSON()
+        const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "6h" });
+        const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+        data.jwt_token = accessToken;
+        data.jwt_refresh = refreshToken;
+        let extras = "jwt_token_validity: 6h, jwt_refresh_validity: 1d"
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-        res.json({ status:true, message: "Login successful", token });
+        return sendResponse(res, 200, true, "Authentication successfull", data=data, extras=extras)
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        return sendResponse(res, 500, false, error.message)
     }
 };

@@ -28,6 +28,14 @@ const User = sequelize.define("User", {
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    avatar: {   
+        type: DataTypes.STRING,
+        defaultValue:"default.png",
+        get() {
+            const rawValue = this.getDataValue("avatar");
+            return `${process.env.BASE_URL}/content/uploads/avatar/${rawValue}`;
+        }
     }
 }, {
     timestamps: true,

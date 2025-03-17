@@ -7,6 +7,17 @@ info:
 servers:
   - url: http://localhost:3000
     description: Local server
+    
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: [] # Apply JWT globally (optional)
+
 
 tags:
   - name: Authentication
@@ -82,6 +93,85 @@ paths:
           description: Missing required fields
         500:
           description: Internal server error
+
+  /api/user/profile:
+      get:
+        summary: API to interact with the assistant
+        security:
+          - bearerAuth: []  # Require JWT authentication for this endpoint
+        tags:
+          - General
+        responses:
+          "200":
+            description: Successfully retrieved user profile
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    email:
+                      type: string
+          "401":
+            description: Unauthorized (Invalid or missing token)
+          "403":
+            description: Forbidden (Token expired or invalid) 
+  /api/upload:
+    post:
+      summary: Upload a file
+      description: Uploads a file with a specified type.
+      tags:
+          - General
+      parameters:
+        - name: type
+          in: query
+          description: The type of the file being uploaded.
+          required: true
+          schema:
+            type: string
+            enum: [image, video, document, avatar]  # Define allowed types
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload.
+      responses:
+        "200":
+          description: File uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File uploaded successfully."
+                  fileUrl:
+                    type: string
+                    example: "https://example.com/uploads/file.jpg"
+        "400":
+          description: Bad request (e.g., missing file or invalid type).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid file type."
+        "500":
+          description: Internal server error.
 
   /api/chat:
     post:
